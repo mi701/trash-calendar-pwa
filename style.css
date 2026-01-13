@@ -1,0 +1,943 @@
+/* ===============================================
+   ベーススタイル
+   =============================================== */
+body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans JP', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5; /* アプリ全体の背景色 */
+    color: #333;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* ===============================================
+   ヘッダー & 場所切り替え
+   =============================================== */
+.app-header {
+    background-color: #ffffff;
+    padding: 15px 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.app-header h1 {
+    margin: 0;
+    font-size: 1.2em;
+    color: #555;
+}
+
+/* 場所切り替えドロップダウン */
+.location-switcher {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.location-switcher label {
+    font-size: 0.9em;
+    color: #777;
+    margin-right: 5px;
+    font-weight: normal;
+}
+
+.location-switcher select {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    font-size: 0.9em;
+    color: #333;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* 下矢印アイコンのSVG */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23777%22%20d%3D%22M7%2C10L12%2C15L17%2C10H7Z%22%20%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 12px;
+    padding-right: 25px;
+    cursor: pointer;
+}
+
+/* ===============================================
+   メインコンテンツエリア & 画面切り替え
+   =============================================== */
+.app-main {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* ===============================================
+   ナビゲーションバー
+   =============================================== */
+.app-navigation {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #ffffff;
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+    padding: 10px 0;
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    z-index: 1000;
+}
+
+.nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    color: #888;
+    font-size: 0.7em;
+    padding: 5px 0;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.nav-item .material-icons {
+    font-size: 24px;
+    margin-bottom: 2px;
+}
+
+.nav-item.active {
+    color: #6a9cff;
+}
+
+.nav-item:focus {
+    outline: none;
+}
+
+/* ===============================================
+   共通コンポーネント (ボタン, 入力, トグル)
+   =============================================== */
+.primary-btn, .secondary-btn {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+.primary-btn {
+    background-color: #6a9cff;
+    color: white;
+}
+
+.primary-btn:hover {
+    background-color: #4a8bff;
+}
+
+.secondary-btn {
+    background-color: #e0e0e0;
+    color: #555;
+}
+
+.secondary-btn:hover {
+    background-color: #d0d0d0;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="time"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+/* トグルスイッチ */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 45px;
+    height: 25px;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-switch label {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 25px;
+}
+
+.toggle-switch label:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 2.5px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + label {
+    background-color: #6a9cff;
+}
+
+.toggle-switch input:checked + label:before {
+    -webkit-transform: translateX(20px);
+    -ms-transform: translateX(20px);
+    transform: translateX(20px);
+}
+
+/* ===============================================
+   カレンダー画面
+   =============================================== */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    margin-bottom: 10px;
+}
+
+.calendar-header h2 {
+    font-size: 1.3em;
+    margin: 0;
+}
+
+.month-nav-btn {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: #6a9cff;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    text-align: center;
+}
+
+.day-label {
+    font-weight: bold;
+    color: #777;
+    padding: 8px 0;
+}
+
+.calendar-grid.days .day-cell {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 10px 5px;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+.calendar-grid.days .day-cell.inactive {
+    background-color: #f8f8f8;
+    color: #bbb;
+}
+
+.calendar-grid.days .day-cell.today {
+    border: 2px solid #6a9cff;
+}
+
+.calendar-grid.days .day-cell .day-number {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.calendar-grid.days .day-cell.inactive .day-number {
+    color: #bbb;
+}
+
+.trash-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
+    color: white;
+    margin: 2px;
+}
+
+/*  不用品回収用のアイコン（角丸四角・特別色） */
+.trash-icon.special-reusable {
+    border-radius: 4px; /* 四角 */
+    background-color: #e67e22 !important; /* キャロットオレンジ */
+    box-shadow: 0 2px 4px rgba(230, 126, 34, 0.3);
+    font-weight: bold;
+}
+
+/* ===============================================
+   個別回収画面 & リスト表示
+   =============================================== */
+.sub-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.sub-tab-btn {
+    flex: 1;
+    padding: 12px 0;
+    border: none;
+    background: none;
+    font-size: 1em;
+    cursor: pointer;
+    color: #777;
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.sub-tab-btn.active {
+    color: #6a9cff;
+}
+
+.sub-tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #6a9cff;
+}
+
+.sub-tab-content {
+    display: none;
+    padding: 15px 0;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 20px;
+}
+
+.sub-tab-content.active {
+    display: block;
+}
+
+.sub-tab-content h3 {
+    margin-top: 0;
+    color: #555;
+}
+
+/* 登録済みリスト表示セクション */
+.registered-list-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px dashed #eee;
+}
+
+.registered-list-section h3 {
+    font-size: 1.1em;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.registered-list .list-item {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+.registered-list .list-item:last-child {
+    margin-bottom: 0;
+}
+
+.registered-list .item-details {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.registered-list .item-details .item-name {
+    font-weight: bold;
+    color: #333;
+    font-size: 1em;
+}
+
+.registered-list .item-details .item-meta {
+    font-size: 0.85em;
+    color: #777;
+}
+
+.registered-list .item-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.registered-list .item-actions button {
+    background: none;
+    border: none;
+    color: #6a9cff;
+    cursor: pointer;
+    font-size: 0.9em;
+    padding: 5px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+}
+
+.registered-list .item-actions button:hover {
+    background-color: #e6f0ff;
+}
+
+.registered-list .item-actions .delete-btn {
+    color: #ff6b6b;
+}
+
+.registered-list .item-actions .delete-btn:hover {
+    background-color: #ffe6e6;
+}
+
+/* ===============================================
+   ルール設定画面
+   =============================================== */
+.add-rule-btn {
+    display: block;
+    width: calc(100% - 20px);
+    margin: 0 auto 20px auto;
+    text-align: center;
+}
+
+.rule-list {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.rule-card {
+    border-bottom: 1px solid #eee;
+    padding: 15px 20px;
+    cursor: grab;
+    transition: background-color 0.2s ease;
+}
+
+.rule-card:last-child {
+    border-bottom: none;
+}
+
+.rule-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rule-card-header .drag-handle {
+    color: #bbb;
+    margin-right: 10px;
+    cursor: grab;
+}
+
+.trash-color-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.rule-name {
+    flex-grow: 1;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.rule-card-header .toggle-switch {
+    margin-right: 10px;
+}
+
+.expand-btn {
+    background: none;
+    border: none;
+    color: #777;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+}
+
+.expand-btn .material-icons {
+    transition: transform 0.3s ease;
+}
+
+.expand-btn.expanded .material-icons {
+    transform: rotate(180deg);
+}
+
+.rule-card-details {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #eee;
+    font-size: 0.9em;
+}
+
+.rule-card-details.hidden {
+    display: none;
+}
+
+.cycle-selector {
+    display: flex;
+    margin-bottom: 15px;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.cycle-selector .segment-btn {
+    flex: 1;
+    padding: 10px 5px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9em;
+    color: #555;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.cycle-selector .segment-btn.active {
+    background-color: #6a9cff;
+    color: white;
+}
+
+.logic-options label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-weight: normal;
+    color: #555;
+}
+
+.logic-options input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.1);
+}
+
+.logic-options input[type="time"] {
+    width: 100px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.delete-rule-btn {
+    background-color: #ff6b6b;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: block;
+    margin-top: 15px;
+}
+
+/* ===============================================
+   システム設定画面 & 場所管理
+   =============================================== */
+.setting-section {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 15px 20px;
+    margin-bottom: 15px;
+}
+
+.setting-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #555;
+    font-size: 1.1em;
+}
+
+.setting-item {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.setting-item label {
+    margin-bottom: 0;
+    flex-grow: 1;
+}
+
+.setting-item input[type="text"] {
+    width: auto;
+    flex-grow: 1;
+    margin-bottom: 0;
+    margin-left: 10px;
+}
+
+.setting-item button {
+    margin-top: 0;
+    margin-left: 10px;
+}
+
+/* 場所管理リスト */
+.location-list .location-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.location-list .location-item:last-child {
+    border-bottom: none;
+}
+
+.location-list .location-item input[type="text"] {
+    flex-grow: 1;
+    margin-bottom: 0;
+    border: none;
+    padding: 5px 0;
+    background: transparent;
+}
+
+.location-list .location-item button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    font-size: 0.8em;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.location-list .location-item .delete-btn {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+}
+
+.location-list .location-item .delete-btn:hover {
+    background-color: #ff4747;
+}
+
+.add-location-btn {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* ===============================================
+   ダークモードスタイル
+   =============================================== */
+body.dark-mode {
+    background-color: #2c2c2c;
+    color: #f0f0f0;
+}
+
+body.dark-mode .app-header,
+body.dark-mode .app-navigation,
+body.dark-mode .screen,
+body.dark-mode .sub-tab-content,
+body.dark-mode .rule-list,
+body.dark-mode .rule-card,
+body.dark-mode .setting-item,
+body.dark-mode .setting-section {
+    background-color: #3a3a3a;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    border-color: #4a4a4a;
+}
+
+body.dark-mode .app-header h1,
+body.dark-mode .app-navigation .nav-item,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode label,
+body.dark-mode .day-label,
+body.dark-mode .day-cell .day-number,
+body.dark-mode .rule-name,
+body.dark-mode .sub-tab-btn {
+    color: #e0e0e0;
+}
+
+body.dark-mode .month-nav-btn,
+body.dark-mode .nav-item.active,
+body.dark-mode .sub-tab-btn.active::after,
+body.dark-mode .toggle-switch input:checked + label,
+body.dark-mode .cycle-selector .segment-btn.active {
+    color: #a0c0ff;
+    background-color: #a0c0ff;
+}
+
+body.dark-mode .primary-btn {
+    background-color: #a0c0ff;
+}
+
+body.dark-mode .primary-btn:hover {
+    background-color: #80a0ff;
+}
+
+body.dark-mode .secondary-btn {
+    background-color: #5a5a5a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .secondary-btn:hover {
+    background-color: #6a6a6a;
+}
+
+body.dark-mode input[type="text"],
+body.dark-mode input[type="number"],
+body.dark-mode input[type="date"],
+body.dark-mode input[type="time"] {
+    background-color: #4a4a4a;
+    border-color: #666;
+    color: #f0f0f0;
+}
+
+body.dark-mode .calendar-grid.days .day-cell.inactive {
+    background-color: #3a3a3a;
+    color: #999;
+}
+
+body.dark-mode .calendar-grid.days .day-cell.inactive .day-number {
+    color: #999;
+}
+
+body.dark-mode .rule-card {
+    border-bottom-color: #4a4a4a;
+}
+
+body.dark-mode .rule-card-details {
+    border-top-color: #4a4a4a;
+}
+
+body.dark-mode .cycle-selector {
+    background-color: #4a4a4a;
+}
+
+body.dark-mode .cycle-selector .segment-btn {
+    color: #e0e0e0;
+}
+
+body.dark-mode .toggle-switch label {
+    background-color: #555;
+}
+
+body.dark-mode .toggle-switch label:before {
+    background-color: #ccc;
+}
+
+/* ダークモード：場所切り替え */
+body.dark-mode .location-switcher select {
+    background-color: #4a4a4a;
+    border-color: #666;
+    color: #f0f0f0;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23e0e0e0%22%20d%3D%22M7%2C10L12%2C15L17%2C10H7Z%22%20%2F%3E%3C%2Fsvg%3E");
+}
+
+body.dark-mode .location-switcher label {
+    color: #e0e0e0;
+}
+
+/* ダークモード：リスト表示 */
+body.dark-mode .registered-list-section {
+    border-top-color: #4a4a4a;
+}
+body.dark-mode .registered-list-section h3 {
+    color: #e0e0e0;
+}
+body.dark-mode .registered-list .list-item {
+    background-color: #4a4a4a;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+body.dark-mode .registered-list .item-details .item-name {
+    color: #f0f0f0;
+}
+body.dark-mode .registered-list .item-details .item-meta {
+    color: #bbb;
+}
+body.dark-mode .registered-list .item-actions button {
+    color: #a0c0ff;
+}
+body.dark-mode .registered-list .item-actions button:hover {
+    background-color: #5a5a5a;
+}
+body.dark-mode .registered-list .item-actions .delete-btn {
+    color: #ff8e8e;
+}
+body.dark-mode .registered-list .item-actions .delete-btn:hover {
+    background-color: #6a4a4a;
+}
+
+/* ダークモード：場所管理 */
+body.dark-mode .setting-section h3 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .location-list .location-item input[type="text"] {
+    color: #f0f0f0;
+}
+
+body.dark-mode .location-list .location-item {
+    border-bottom-color: #4a4a4a;
+}
+
+/* 1. カレンダー凡例エリア */
+.calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #fcfcfc;
+    border-radius: 8px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.8em;
+    color: #555;
+}
+
+.legend-item .trash-color-circle {
+    width: 12px;
+    height: 12px;
+    margin-right: 5px;
+    border: none; /* 凡例用は枠線なし */
+}
+
+/* 2. 時間選択セレクトボックス */
+.time-select-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.time-select-wrapper select {
+    width: auto;
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+    background-color: #fff;
+}
+
+.time-select-wrapper span {
+    font-weight: bold;
+    color: #555;
+}
+
+/* 3. バックアップ警告 */
+.backup-warning {
+    background-color: #fff3cd; /* 薄い黄色 */
+    color: #856404; /* 濃い黄色文字 */
+    border: 1px solid #ffeeba;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+/* 4. 危険エリア（初期化ボタン） */
+.danger-zone {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    text-align: center;
+}
+
+.danger-btn {
+    background-color: #ff4d4d; /* 赤色 */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    width: 100%;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.danger-btn:hover {
+    background-color: #e60000;
+}
+
+/* ダークモード対応 */
+body.dark-mode .calendar-legend {
+    background-color: #444;
+}
+body.dark-mode .legend-item {
+    color: #ddd;
+}
+body.dark-mode .time-select-wrapper select {
+    background-color: #4a4a4a;
+    color: #f0f0f0;
+    border-color: #666;
+}
+body.dark-mode .time-select-wrapper span {
+    color: #ddd;
+}
+body.dark-mode .backup-warning {
+    background-color: #4d4d00;
+    color: #ffffcc;
+    border-color: #666600;
+}
+body.dark-mode .danger-zone {
+    border-top-color: #555;
+}
