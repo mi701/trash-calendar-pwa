@@ -1,9 +1,8 @@
-
 {
     "name": "ごみ捨てカレンダー",
     "short_name": "ごみカレ",
-    "description": "Clean, Pastel, Modern Japanese UIのPWAアプリ",
-    "start_url": "/",
+    "description": "ゴミ収集日を一括管理するアプリ",
+    "start_url": "./index.html",
     "display": "standalone",
     "background_color": "#f0f2f5",
     "theme_color": "#6a9cff",
