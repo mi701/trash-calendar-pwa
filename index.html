@@ -20,6 +20,7 @@
         <div id="locationSwitcher" class="location-switcher">
             <label for="currentLocationSelect">表示中の場所:</label>
             <select id="currentLocationSelect"></select>
+            <select id="currentLocationSelect" name="current_location" aria-label="表示中の場所"></select>
         </div>
     </header>
 
@@ -78,7 +79,8 @@
         <input type="text" id="reusable_item" placeholder="例: 古着、小型家電">
     <label>回収時間:</label>
     <div class="time-select-wrapper">
-        <select id="reusable_time_hour">
+        <select id="reusable_time_hour"></select>
+        <select id="reusable_time_hour" aria-label="回収時間の時"></select>
             <!-- 0時から23時まで -->
             <option value="06">06</option><option value="07">07</option><option value="08" selected>08</option><option value="09">09</option><option value="10">10</option>
             <option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option>
@@ -86,7 +88,8 @@
             <!-- 必要に応じて他の時間も追加してください -->
         </select>
         <span>:</span>
-        <select id="reusable_time_minute">
+         <select id="reusable_time_minute"></select>
+         <select id="reusable_time_minute" aria-label="回収時間の分"></select>
             <option value="00">00</option>
             <option value="10">10</option>
             <option value="20">20</option>
@@ -113,36 +116,7 @@
             <button class="add-rule-btn primary-btn">新しいゴミ種別を追加</button>
             <div id="ruleList" class="rule-list">
                 <!-- ゴミ種別カードはJavaScriptで生成されます -->
-                <div class="rule-card">
-                    <div class="rule-card-header">
-                        <span class="material-icons drag-handle">drag_indicator</span>
-                        <div class="trash-color-circle" style="background-color: #ff6b6b;"></div>
-                        <span class="rule-name">可燃ごみ</span>
-                        <div class="toggle-switch">
-                            <input type="checkbox" id="toggle_burnable" checked>
-                            <label for="toggle_burnable"></label>
-                        </div>
-                        <button class="expand-btn"><span class="material-icons">expand_more</span></button>
-                    </div>
-                    <div class="rule-card-details hidden">
-                        <!-- 詳細設定はJavaScriptで動的に生成 -->
-                        <div class="cycle-selector">
-                            <button class="segment-btn active" data-cycle="weekly">毎週</button>
-                            <button class="segment-btn" data-cycle="nth_weekday">第n曜日</button>
-                            <button class="segment-btn" data-cycle="interval">隔週</button>
-                            <button class="segment-btn" data-cycle="specific">特定日</button>
-                        </div>
-                        <div class="cycle-details">
-                            <!-- 選択されたcycleTypeに応じて詳細UIを生成 -->
-                        </div>
-                        <div class="logic-options">
-                            <label><input type="checkbox"> 祝日は収集休み</label>
-                            <label><input type="checkbox"> 当日朝に通知する</label>
-                            <input type="time" value="07:00">
-                        </div>
-                        <button class="delete-rule-btn">この種別を削除</button>
-                    </div>
-                </div>
+                
             </div>
         </section>
 

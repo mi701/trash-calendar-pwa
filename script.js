@@ -214,7 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 dayCell.appendChild(icon);
             });
 
-            // ★修正箇所: 不用品回収のスタイルを強制適用
             getSpecialCollectionsForDay(currentDay).forEach(item => {
                 const specialIcon = document.createElement('span');
                 specialIcon.classList.add('trash-icon');
@@ -223,10 +222,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     specialIcon.style.backgroundColor = '#8e79ff';
                     specialIcon.textContent = '粗';
                 } else if (item.type === 'reusable') {
-                    // ★ここです！色と形を直接指定
                     specialIcon.classList.add('special-reusable');
-                    specialIcon.style.backgroundColor = '#e67e22'; // 色 (キャロットオレンジ)
-                    specialIcon.style.borderRadius = '4px';        // 形 (四角)
+                    specialIcon.style.backgroundColor = '#e67e22'; 
+                    specialIcon.style.borderRadius = '4px';        
                     specialIcon.textContent = '回';
                 }
                 
@@ -256,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
         bulkLegend.innerHTML = `<div class="trash-color-circle" style="background-color: #8e79ff;"></div> 粗大ごみ`;
         calendarLegend.appendChild(bulkLegend);
 
-        // ★修正箇所: 凡例も強制適用
         const reuseLegend = document.createElement('div');
         reuseLegend.classList.add('legend-item');
         reuseLegend.innerHTML = `<div class="trash-color-circle special-reusable" style="background-color: #e67e22; border-radius: 4px;"></div> 不用品回収`;
@@ -480,17 +477,25 @@ document.addEventListener('DOMContentLoaded', () => {
         ruleList.innerHTML = '';
         const data = getCurrentLocationData();
         if (!data || !data.trashRules) return;
+        
         data.trashRules.forEach(rule => {
             const card = document.createElement('div');
             card.className = 'rule-card';
+            const disabledClass = rule.active ? '' : 'disabled'; // ★追加: 初期状態のクラス
+
             card.innerHTML = `
                 <div class="rule-card-header">
-                    <span class="material-icons drag-handle">drag_indicator</span><div class="trash-color-circle" style="background-color: ${rule.color};"></div>
+                    <span class="material-icons drag-handle">drag_indicator</span>
+                    <div class="trash-color-circle" style="background-color: ${rule.color};"></div>
                     <span class="rule-name">${rule.name}</span>
-                    <div class="toggle-switch"><input type="checkbox" id="toggle_${rule.id}" ${rule.active ? 'checked' : ''}><label for="toggle_${rule.id}"></label></div>
+                    <div class="toggle-switch">
+                        <!-- ★修正: name属性を追加 -->
+                        <input type="checkbox" id="toggle_${rule.id}" name="toggle_${rule.id}" ${rule.active ? 'checked' : ''}>
+                        <label for="toggle_${rule.id}"></label>
+                    </div>
                     <button class="expand-btn"><span class="material-icons">expand_more</span></button>
                 </div>
-                <div class="rule-card-details hidden">
+                <div class="rule-card-details hidden ${disabledClass}">
                     <div class="cycle-selector">
                         <button class="segment-btn ${rule.cycleType === 'weekly' ? 'active' : ''}" data-cycle="weekly">毎週</button>
                         <button class="segment-btn ${rule.cycleType === 'nth_weekday' ? 'active' : ''}" data-cycle="nth_weekday">第n曜日</button>
@@ -499,20 +504,66 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="cycle-details"></div>
                     <div class="logic-options">
-                        <label><input type="checkbox" ${rule.holidaySkip ? 'checked' : ''} data-setting="holidaySkip"> 祝日は収集休み</label>
-                        <label><input type="checkbox" ${rule.notify ? 'checked' : ''} data-setting="notify"> 当日朝に通知する</label>
-                        <input type="time" value="${rule.notifyTime || '07:00'}" data-setting="notifyTime">
+                        <!-- ★修正: name属性を追加 -->
+                        <label><input type="checkbox" name="holiday_skip_${rule.id}" ${rule.holidaySkip ? 'checked' : ''} data-setting="holidaySkip"> 祝日は収集休み</label>
+                        <label><input type="checkbox" name="notify_${rule.id}" ${rule.notify ? 'checked' : ''} data-setting="notify"> 当日朝に通知する</label>
+                        <!-- ★修正: name属性とaria-labelを追加 -->
+                        <input type="time" name="notify_time_${rule.id}" aria-label="通知時間" value="${rule.notifyTime || '07:00'}" data-setting="notifyTime">
                     </div>
                     <button class="delete-rule-btn">この種別を削除</button>
                 </div>`;
             ruleList.appendChild(card);
             
-            card.querySelector('.toggle-switch input').addEventListener('change', (e) => { rule.active = e.target.checked; saveAppData(); renderCalendar(currentCalendarDate); });
             const details = card.querySelector('.rule-card-details');
-            card.querySelector('.expand-btn').addEventListener('click', () => { details.classList.toggle('hidden'); if(!details.classList.contains('hidden')) renderCycleDetails(details.querySelector('.cycle-details'), rule); });
-            card.querySelector('.delete-rule-btn').addEventListener('click', () => { if(confirm('削除しますか？')){ data.trashRules = data.trashRules.filter(r => r.id !== rule.id); saveAppData(); renderRuleList(); renderCalendar(currentCalendarDate); } });
-            card.querySelectorAll('.segment-btn').forEach(b => b.addEventListener('click', () => { rule.cycleType = b.dataset.cycle; saveAppData(); renderCycleDetails(details.querySelector('.cycle-details'), rule); renderCalendar(currentCalendarDate); renderRuleList(); }));
-            details.querySelectorAll('.logic-options input').forEach(i => i.addEventListener('change', (e) => { const k = e.target.dataset.setting; rule[k] = e.target.type === 'checkbox' ? e.target.checked : e.target.value; saveAppData(); }));
+
+            // ★修正: トグル切り替え処理
+            card.querySelector('.toggle-switch input').addEventListener('change', (e) => { 
+                const currentData = getCurrentLocationData();
+                const targetRule = currentData.trashRules.find(r => r.id === rule.id);
+                
+                if (targetRule) {
+                    targetRule.active = e.target.checked;
+                    rule.active = e.target.checked;
+                }
+
+                if (e.target.checked) {
+                    details.classList.remove('disabled');
+                } else {
+                    details.classList.add('disabled');
+                }
+                saveAppData(); 
+                renderCalendar(currentCalendarDate); 
+            });
+
+            const detailsSection = card.querySelector('.rule-card-details');
+            card.querySelector('.expand-btn').addEventListener('click', () => { 
+                detailsSection.classList.toggle('hidden'); 
+                if(!detailsSection.classList.contains('hidden')) renderCycleDetails(detailsSection.querySelector('.cycle-details'), rule); 
+            });
+            
+            card.querySelector('.delete-rule-btn').addEventListener('click', () => { 
+                if(confirm('削除しますか？')){ 
+                    data.trashRules = data.trashRules.filter(r => r.id !== rule.id); 
+                    saveAppData(); renderRuleList(); renderCalendar(currentCalendarDate); 
+                } 
+            });
+            
+            card.querySelectorAll('.segment-btn').forEach(b => b.addEventListener('click', () => { 
+                rule.cycleType = b.dataset.cycle; 
+                saveAppData(); 
+                renderCycleDetails(detailsSection.querySelector('.cycle-details'), rule); 
+                renderCalendar(currentCalendarDate); 
+                card.querySelectorAll('.segment-btn').forEach(btn => btn.classList.remove('active'));
+                b.classList.add('active');
+            }));
+            
+            detailsSection.querySelectorAll('.logic-options input').forEach(i => i.addEventListener('change', (e) => { 
+                const k = e.target.dataset.setting; 
+                rule[k] = e.target.type === 'checkbox' ? e.target.checked : e.target.value; 
+                saveAppData(); 
+            }));
+
+            if (!detailsSection.classList.contains('hidden')) renderCycleDetails(detailsSection.querySelector('.cycle-details'), rule);
         });
     }
 
@@ -522,15 +573,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if(rule.cycleType === 'weekly') {
             const days = ['月','火','水','木','金','土','日'];
             html = '<div class="checkbox-group">';
-            days.forEach((d,i)=>{ html+=`<label><input type="checkbox" data-day="${i+1}" ${(rule.weeklyDays||[]).includes(i+1)?'checked':''}> ${d}</label>`; });
+            // ★修正: name属性を追加
+            days.forEach((d,i)=>{ html+=`<label><input type="checkbox" name="weekday_${rule.id}_${i}" data-day="${i+1}" ${(rule.weeklyDays||[]).includes(i+1)?'checked':''}> ${d}</label>`; });
             html += '</div>';
         } else if(rule.cycleType === 'nth_weekday') {
-            html = `<label>回数:</label><select class="nth-week-select">${['第1','第2','第3','第4','第1・3','第2・4'].map(o=>`<option ${rule.nthWeek===o?'selected':''}>${o}</option>`).join('')}</select>
-                    <label>曜日:</label><select class="nth-weekday-select">${['月','火','水','木','金','土','日'].map((o,i)=>`<option value="${i+1}" ${rule.nthWeekday===(i+1)?'selected':''}>${o}曜日</option>`).join('')}</select>`;
+            // ★修正: name属性とaria-labelを追加
+            html = `<label>回数:</label><select class="nth-week-select" name="nth_week_${rule.id}" aria-label="第n週">${['第1','第2','第3','第4','第1・3','第2・4'].map(o=>`<option ${rule.nthWeek===o?'selected':''}>${o}</option>`).join('')}</select>
+                    <label>曜日:</label><select class="nth-weekday-select" name="nth_weekday_${rule.id}" aria-label="曜日">${['月','火','水','木','金','土','日'].map((o,i)=>`<option value="${i+1}" ${rule.nthWeekday===(i+1)?'selected':''}>${o}曜日</option>`).join('')}</select>`;
         } else if(rule.cycleType === 'interval') {
-            html = `<label>開始日:</label><input type="date" class="interval-start-date" value="${rule.intervalStart||''}"><label>間隔:</label><select class="interval-period-select"><option value="2" ${rule.intervalPeriod===2?'selected':''}>2週間ごと</option><option value="3" ${rule.intervalPeriod===3?'selected':''}>3週間ごと</option></select>`;
+            // ★修正: name属性とaria-labelを追加
+            html = `<label>開始日:</label><input type="date" class="interval-start-date" name="interval_start_${rule.id}" aria-label="間隔開始日" value="${rule.intervalStart||''}"><label>間隔:</label><select class="interval-period-select" name="interval_period_${rule.id}" aria-label="間隔"><option value="2" ${rule.intervalPeriod===2?'selected':''}>2週間ごと</option><option value="3" ${rule.intervalPeriod===3?'selected':''}>3週間ごと</option></select>`;
         } else if(rule.cycleType === 'specific') {
-            html = `<label>日付(カンマ区切り):</label><input type="text" class="specific-dates-input" value="${(rule.specificDates||[]).join(', ')}">`;
+            // ★修正: name属性とaria-labelを追加
+            html = `<label>日付(カンマ区切り):</label><input type="text" class="specific-dates-input" name="specific_dates_${rule.id}" aria-label="特定日" value="${(rule.specificDates||[]).join(', ')}">`;
         }
         container.innerHTML = html;
         
@@ -564,7 +619,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const locs = appData.locations;
         for(const id in locs) {
             const div = document.createElement('div'); div.className='location-item';
-            div.innerHTML = `<input type="text" value="${locs[id].name}" data-id="${id}"> ${id!=='home'?'<button class="delete-btn">削除</button>':''}`;
+            // ★修正: name属性とaria-labelを追加
+            div.innerHTML = `<input type="text" name="location_name_${id}" aria-label="場所名" value="${locs[id].name}" data-id="${id}"> ${id!=='home'?'<button class="delete-btn">削除</button>':''}`;
             locationListContainer.appendChild(div);
             div.querySelector('input').addEventListener('change',e=>{locs[e.target.dataset.id].name=e.target.value; saveAppData(); renderLocationSwitcher(); if(appData.settings.currentLocationId===id)showScreen(currentActiveScreen);});
             if(id!=='home') div.querySelector('button').addEventListener('click',()=>{ if(confirm('削除しますか？')){ delete locs[id]; if(appData.settings.currentLocationId===id)appData.settings.currentLocationId='home'; saveAppData(); renderLocationManagement(); showScreen(currentActiveScreen); } });
