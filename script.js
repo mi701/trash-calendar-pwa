@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Service Worker登録
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/service-worker.js').catch(() => {});
     }
@@ -16,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const calendarLegend = document.getElementById('calendarLegend');
     const subTabBtns = document.querySelectorAll('.sub-tab-btn');
     const subTabContents = document.querySelectorAll('.sub-tab-content');
+    
     const bulkDateInput = document.getElementById('bulk_date');
     const bulkItemInput = document.getElementById('bulk_item');
     const bulkAmountInput = document.getElementById('bulk_amount');
@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const reusableTimeHour = document.getElementById('reusable_time_hour');
     const reusableTimeMinute = document.getElementById('reusable_time_minute');
     const registerReusableBtn = document.getElementById('registerReusableBtn');
+    
     const bulkWasteListContainer = document.getElementById('bulkWasteList');
     const reusableListContainer = document.getElementById('reusableList');
     const addRuleBtn = document.querySelector('.add-rule-btn');
@@ -40,16 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const showDangerZoneToggle = document.getElementById('showDangerZoneToggle');
     const dangerZone = document.getElementById('dangerZone');
 
-    // --- データ管理ロジック (Blueprint準拠) ---
+    // --- データ管理 ---
     let currentActiveScreen = 'calendar';
     let currentCalendarDate = new Date();
     const STORAGE_KEY = 'trash_app_data';
 
     let appData = {
         settings: { currentLocationId: 'home', darkMode: false },
-        locations: { 
-            "home": { id: "home", name: "自宅", trashRules: [], specialCollections: { bulkWaste: [], reusable: [] } } 
-        }
+        locations: { "home": { id: "home", name: "自宅", trashRules: [], specialCollections: { bulkWaste: [], reusable: [] } } }
     };
 
     function loadAppData() {
@@ -65,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
             appData.settings.currentLocationId = Object.keys(appData.locations)[0] || 'home';
         }
         const loc = appData.locations[appData.settings.currentLocationId];
+        // デフォルトデータの補完
         if (!loc.trashRules || loc.trashRules.length === 0) {
             loc.trashRules = [
                 { id: 'burnable', name: '可燃ごみ', color: '#ff6b6b', active: true, cycleType: 'weekly', weeklyDays: [1, 4], nthWeek: "第1", nthWeekday: 1 },
@@ -72,12 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
             saveAppData();
         }
+        if (!loc.specialCollections) loc.specialCollections = { bulkWaste: [], reusable: [] };
     }
 
     function saveAppData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
     function getCurrentLocationData() { return appData.locations[appData.settings.currentLocationId]; }
 
-    // --- ナビゲーション ---
+    // --- 画面切り替え ---
     function showScreen(screenId) {
         screens.forEach(s => s.classList.toggle('active', s.id === screenId));
         navItems.forEach(n => n.classList.toggle('active', n.dataset.screen === screenId));
@@ -103,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         appData.settings.currentLocationId = e.target.value; saveAppData(); showScreen(currentActiveScreen);
     });
 
-    // --- カレンダー ---
+    // --- カレンダー描画 ---
     function renderCalendar(date) {
         currentCalendarDate = new Date(date.getFullYear(), date.getMonth(), 1);
         currentMonthDisplay.textContent = `${date.getFullYear()}年 ${date.getMonth() + 1}月`;
@@ -222,14 +223,13 @@ document.addEventListener('DOMContentLoaded', () => {
         saveAppData(); renderSpecialCollectionsList(); renderCalendar(currentCalendarDate);
     };
 
-    // --- ルール設定 (トグリスイッチ HTML構造復活) ---
+    // --- ルール設定 ---
     function renderRuleList() {
         ruleList.innerHTML = '';
         const data = getCurrentLocationData();
         if (!data || !data.trashRules) return;
         data.trashRules.forEach(rule => {
             const card = document.createElement('div'); card.className = 'rule-card card';
-            // トグリスイッチ用のHTML構造を確実に適用
             card.innerHTML = `
                 <div class="rule-card-header">
                     <div class="trash-color-circle" style="background-color: ${rule.color};"></div>
@@ -257,7 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 expandIcon.textContent = isHidden ? 'expand_more' : 'expand_less';
                 if (!isHidden) renderCycleDetails(details.querySelector('.cycle-details'), rule);
             });
-            // トグリスイッチの変更イベント
             card.querySelector('.toggle-switch input').addEventListener('change', (e) => {
                 rule.active = e.target.checked; saveAppData(); renderCalendar(currentCalendarDate);
             });
@@ -300,6 +299,13 @@ document.addEventListener('DOMContentLoaded', () => {
             container.querySelector('.nth-dow-select').addEventListener('change', e => { rule.nthWeekday = parseInt(e.target.value); saveAppData(); renderCalendar(currentCalendarDate); });
         }
     }
+
+    addRuleBtn.addEventListener('click', () => {
+        const data = getCurrentLocationData();
+        const id = 'rule_' + Date.now();
+        data.trashRules.push({ id, name: "新しいゴミ", color: "#cccccc", active: true, cycleType: "weekly", weeklyDays: [], nthWeek: "第1", nthWeekday: 1 });
+        saveAppData(); renderRuleList();
+    });
 
     // --- システム ---
     function loadSettings() {

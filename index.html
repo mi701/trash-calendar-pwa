@@ -48,7 +48,7 @@
 
             <div id="bulk_waste_form" class="sub-tab-content active">
                 <h3>粗大ごみ登録</h3>
-                <div class="input-group">
+                <div class="input-group card">
                     <label>日付</label><input type="date" id="bulk_date">
                     <label>品目</label><input type="text" id="bulk_item" placeholder="例: ベッド、自転車">
                     <div class="row-inputs">
@@ -65,7 +65,7 @@
 
             <div id="reusable_form" class="sub-tab-content">
                 <h3>不用品回収登録</h3>
-                <div class="input-group">
+                <div class="input-group card">
                     <label>日付</label><input type="date" id="reusable_date">
                     <label>品目</label><input type="text" id="reusable_item" placeholder="例: 古着、小型家電">
                     <label>回収時間</label>
@@ -126,10 +126,7 @@
             <div class="danger-zone-wrapper">
                 <div class="toggle-switch-wrapper">
                     <span class="hint-text">高度な管理機能を表示</span>
-                    <div class="toggle-switch small">
-                        <input type="checkbox" id="showDangerZoneToggle">
-                        <label for="showDangerZoneToggle"></label>
-                    </div>
+                    <div class="toggle-switch small"><input type="checkbox" id="showDangerZoneToggle"><label for="showDangerZoneToggle"></label></div>
                 </div>
                 <div id="dangerZone" class="danger-zone hidden">
                     <button id="resetAllDataBtn" class="danger-btn-outline"><span class="material-icons">auto_delete</span><span>全データを初期化</span></button>

@@ -34,7 +34,7 @@ body {
     display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 1000;
 }
 .app-header h1 { margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--primary); }
-.location-switcher { display: flex; align-items: center; background: #f0f2f5; padding: 5px 14px; border-radius: 20px; gap: 4px; }
+.location-switcher { display: flex; align-items: center; background: #f0f2f5; padding: 4px 14px; border-radius: 20px; gap: 4px; }
 .location-switcher select { border: none; background: transparent; font-weight: 700; font-size: 0.85rem; outline: none; }
 
 /* ===============================================
@@ -63,12 +63,12 @@ body {
 .trash-color-circle { width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
 
 /* ===============================================
-   トグリスイッチ (完全復活)
+   トグリスイッチ (重要: チェックボックスを隠してトグル化)
    =============================================== */
-.toggle-switch { position: relative; width: 44px; height: 24px; }
-.toggle-switch input { opacity: 0; width: 0; height: 0; }
-.toggle-switch label { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #e0e0e0; border-radius: 24px; cursor: pointer; transition: .3s; }
-.toggle-switch label:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.toggle-switch { position: relative; width: 46px; height: 26px; flex-shrink: 0; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-switch label { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #e0e0e0; border-radius: 26px; cursor: pointer; transition: .3s; }
+.toggle-switch label:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 .toggle-switch input:checked + label { background-color: var(--primary); }
 .toggle-switch input:checked + label:before { transform: translateX(20px); }
 
@@ -78,19 +78,22 @@ body {
 .toggle-switch.small input:checked + label:before { transform: translateX(18px); }
 
 /* ===============================================
-   個別回収サブタブ
+   個別回収サブタブ (重要: display制御)
    =============================================== */
 .sub-tabs { display: flex; gap: 8px; margin-bottom: 15px; background: #eee; padding: 4px; border-radius: 12px; }
 .sub-tab-btn { flex: 1; padding: 12px; border: none; border-radius: 10px; background: transparent; color: var(--text-light); font-weight: 700; font-size: 0.85rem; cursor: pointer; }
 .sub-tab-btn.active { background: var(--card); color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 
+/* 非アクティブなコンテンツを強制非表示 */
 .sub-tab-content { display: none !important; }
 .sub-tab-content.active { display: block !important; }
 
-.input-group { background: var(--card); padding: 20px; border-radius: 20px; box-shadow: var(--shadow); margin-bottom: 25px; }
+/* フォーム調整 */
+.input-group { padding: 20px; margin-bottom: 25px; }
 .row-inputs { display: flex; gap: 15px; }
 .row-inputs .col { flex: 1; }
 
+/* リスト調整 */
 .registered-list-section { margin-top: 30px; }
 .list-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; margin-bottom: 12px; }
 .list-info { display: flex; flex-direction: column; gap: 2px; }
@@ -127,6 +130,7 @@ body {
 .header-title h3 { margin: 0; font-size: 1rem; font-weight: 800; }
 .location-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; background: #f9f9f9; border-radius: 12px; margin-bottom: 8px; }
 .loc-name-wrap { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.loc-del-btn { border: none; background: transparent; color: #ccc; cursor: pointer; }
 .add-text-btn { border: none; background: transparent; color: var(--primary); font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; padding: 8px 5px; cursor: pointer; }
 .divider { height: 1px; background: var(--border); margin: 15px 0; }
 .setting-row { display: flex; justify-content: space-between; align-items: center; }
@@ -142,6 +146,7 @@ body {
    =============================================== */
 .primary-btn { width: 100%; padding: 16px; border: none; border-radius: 16px; background: var(--primary); color: white; font-weight: 800; cursor: pointer; }
 input, select { width: 100%; padding: 12px; margin: 5px 0 15px; border-radius: 12px; border: 1px solid #eee; background: #fdfdfd; font-size: 1rem; font-weight: 700; outline: none; }
+label { font-size: 0.8rem; font-weight: 800; color: var(--text-light); margin-left: 5px; }
 
 .app-navigation { position: fixed; bottom: 0; width: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 10px 0 30px; border-top: 1px solid #f0f0f0; z-index: 1000; }
 .nav-item { border: none; background: none; color: #ccc; display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; cursor: pointer; }
@@ -150,7 +155,9 @@ input, select { width: 100%; padding: 12px; margin: 5px 0 15px; border-radius: 1
 
 .danger-btn-outline { background: transparent; border: 2px solid #ffcccc; color: #ff8888; border-radius: 16px; padding: 15px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; cursor: pointer; }
 
-/* ダークモード補足 */
+/* ダークモード補正 */
 body.dark-mode { --bg: #121212; --card: #1e1e1e; --text: #f0f0f0; --border: #333333; }
 body.dark-mode .app-header, body.dark-mode .app-navigation { background: rgba(30, 30, 30, 0.95); }
 body.dark-mode input, body.dark-mode select, body.dark-mode .location-row, body.dark-mode .tool-btn, body.dark-mode .day-check { background: #2a2a2a; border-color: #333; color: white; }
+body.dark-mode .location-switcher, body.dark-mode .sub-tabs { background: #2a2a2a; }
+body.dark-mode .month-nav-btn { background: #1e1e1e; color: var(--primary); }
