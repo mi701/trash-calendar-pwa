@@ -51,6 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
         locations: { "home": { id: "home", name: "自宅", trashRules: [], specialCollections: { bulkWaste: [], reusable: [] } } }
     };
 
+    /**
+     * データ読み込みとフルセット初期化
+     */
     function loadAppData() {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
@@ -60,15 +63,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (parsed.settings) appData.settings = parsed.settings;
             } catch (e) { console.error("Load Error", e); }
         }
+        
         if (!appData.locations[appData.settings.currentLocationId]) {
             appData.settings.currentLocationId = Object.keys(appData.locations)[0] || 'home';
         }
+
         const loc = appData.locations[appData.settings.currentLocationId];
-        // デフォルトデータの補完
+
+        // ゴミ種別が空（新規またはリセット後）ならフルセットを作成
         if (!loc.trashRules || loc.trashRules.length === 0) {
             loc.trashRules = [
                 { id: 'burnable', name: '可燃ごみ', color: '#ff6b6b', active: true, cycleType: 'weekly', weeklyDays: [1, 4], nthWeek: "第1", nthWeekday: 1 },
-                { id: 'plastic', name: 'プラスチック', color: '#ffd166', active: true, cycleType: 'weekly', weeklyDays: [3], nthWeek: "第1", nthWeekday: 1 }
+                { id: 'non_burnable', name: '不燃ごみ', color: '#6a9cff', active: true, cycleType: 'nth_weekday', nthWeek: "第2・4", nthWeekday: 3 },
+                { id: 'plastic', name: 'プラスチック', color: '#ffd166', active: true, cycleType: 'weekly', weeklyDays: [3], nthWeek: "第1", nthWeekday: 1 },
+                { id: 'resource', name: '資源ごみ', color: '#06d6a0', active: true, cycleType: 'weekly', weeklyDays: [5], nthWeek: "第1", nthWeekday: 1 },
+                { id: 'pet', name: 'ペットボトル', color: '#118ab2', active: true, cycleType: 'nth_weekday', nthWeek: "第1・3", nthWeekday: 2 },
+                { id: 'paper', name: '古紙', color: '#ef476f', active: true, cycleType: 'nth_weekday', nthWeek: "第2", nthWeekday: 6 }
             ];
             saveAppData();
         }
@@ -78,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function saveAppData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
     function getCurrentLocationData() { return appData.locations[appData.settings.currentLocationId]; }
 
-    // --- 画面切り替え ---
+    // --- ナビゲーション ---
     function showScreen(screenId) {
         screens.forEach(s => s.classList.toggle('active', s.id === screenId));
         navItems.forEach(n => n.classList.toggle('active', n.dataset.screen === screenId));
@@ -104,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         appData.settings.currentLocationId = e.target.value; saveAppData(); showScreen(currentActiveScreen);
     });
 
-    // --- カレンダー描画 ---
+    // --- カレンダー ---
     function renderCalendar(date) {
         currentCalendarDate = new Date(date.getFullYear(), date.getMonth(), 1);
         currentMonthDisplay.textContent = `${date.getFullYear()}年 ${date.getMonth() + 1}月`;
