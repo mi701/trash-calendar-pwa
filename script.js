@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const calendarLegend = document.getElementById('calendarLegend');
     const subTabBtns = document.querySelectorAll('.sub-tab-btn');
     const subTabContents = document.querySelectorAll('.sub-tab-content');
-    
     const bulkDateInput = document.getElementById('bulk_date');
     const bulkItemInput = document.getElementById('bulk_item');
     const bulkAmountInput = document.getElementById('bulk_amount');
@@ -27,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const reusableTimeHour = document.getElementById('reusable_time_hour');
     const reusableTimeMinute = document.getElementById('reusable_time_minute');
     const registerReusableBtn = document.getElementById('registerReusableBtn');
-    
     const bulkWasteListContainer = document.getElementById('bulkWasteList');
     const reusableListContainer = document.getElementById('reusableList');
     const addRuleBtn = document.querySelector('.add-rule-btn');
@@ -42,21 +40,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const showDangerZoneToggle = document.getElementById('showDangerZoneToggle');
     const dangerZone = document.getElementById('dangerZone');
 
-    // --- データ初期化 (Blueprint準拠 + 安全な読み込み) ---
+    // --- データ管理ロジック (Blueprint準拠) ---
     let currentActiveScreen = 'calendar';
     let currentCalendarDate = new Date();
     const STORAGE_KEY = 'trash_app_data';
 
-    // 初期構造（データがない場合のデフォルト）
     let appData = {
         settings: { currentLocationId: 'home', darkMode: false },
         locations: { 
-            "home": { 
-                id: "home", 
-                name: "自宅", 
-                trashRules: [], 
-                specialCollections: { bulkWaste: [], reusable: [] } 
-            } 
+            "home": { id: "home", name: "自宅", trashRules: [], specialCollections: { bulkWaste: [], reusable: [] } } 
         }
     };
 
@@ -65,20 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (stored) {
             try {
                 const parsed = JSON.parse(stored);
-                // 既存のデータをマージ（場所が消えないように保護）
                 if (parsed.locations) appData.locations = parsed.locations;
                 if (parsed.settings) appData.settings = parsed.settings;
-            } catch (e) {
-                console.error("Data load error", e);
-            }
+            } catch (e) { console.error("Load Error", e); }
         }
-
-        // 現在の場所IDが存在するかチェック。なければ最初の場所にする。
         if (!appData.locations[appData.settings.currentLocationId]) {
             appData.settings.currentLocationId = Object.keys(appData.locations)[0] || 'home';
         }
-
-        // 場所のデータが壊れていれば補完
         const loc = appData.locations[appData.settings.currentLocationId];
         if (!loc.trashRules || loc.trashRules.length === 0) {
             loc.trashRules = [
@@ -87,16 +72,12 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
             saveAppData();
         }
-        if (!loc.specialCollections) {
-            loc.specialCollections = { bulkWaste: [], reusable: [] };
-            saveAppData();
-        }
     }
 
     function saveAppData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
     function getCurrentLocationData() { return appData.locations[appData.settings.currentLocationId]; }
 
-    // --- 画面切り替え ---
+    // --- ナビゲーション ---
     function showScreen(screenId) {
         screens.forEach(s => s.classList.toggle('active', s.id === screenId));
         navItems.forEach(n => n.classList.toggle('active', n.dataset.screen === screenId));
@@ -122,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         appData.settings.currentLocationId = e.target.value; saveAppData(); showScreen(currentActiveScreen);
     });
 
-    // --- カレンダー描画 ---
+    // --- カレンダー ---
     function renderCalendar(date) {
         currentCalendarDate = new Date(date.getFullYear(), date.getMonth(), 1);
         currentMonthDisplay.textContent = `${date.getFullYear()}年 ${date.getMonth() + 1}月`;
@@ -131,7 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const firstDay = new Date(year, month, 1).getDay();
         const lastDate = new Date(year, month + 1, 0).getDate();
         let offset = firstDay === 0 ? 6 : firstDay - 1;
-
         for (let i = 0; i < offset; i++) {
             const empty = document.createElement('div'); empty.className = 'day-cell inactive';
             calendarDaysGrid.appendChild(empty);
@@ -162,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const d = date.getDate(), dow = date.getDay() === 0 ? 7 : date.getDay();
         const data = getCurrentLocationData();
         if (!data || !data.trashRules) return results;
-
         data.trashRules.forEach(rule => {
             if (!rule.active) return;
             if (rule.cycleType === 'weekly' && rule.weeklyDays && rule.weeklyDays.includes(dow)) results.push(rule);
@@ -178,7 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const f = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`;
         const data = getCurrentLocationData();
         if (!data || !data.specialCollections) return results;
-
         data.specialCollections.bulkWaste.forEach(i => { if (i.date === f) results.push({...i, type:'bulk'}); });
         data.specialCollections.reusable.forEach(i => { if (i.date === f) results.push({...i, type:'reusable'}); });
         return results;
@@ -199,14 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
     prevMonthBtn.addEventListener('click', () => { currentCalendarDate.setMonth(currentCalendarDate.getMonth()-1); renderCalendar(currentCalendarDate); });
     nextMonthBtn.addEventListener('click', () => { currentCalendarDate.setMonth(currentCalendarDate.getMonth()+1); renderCalendar(currentCalendarDate); });
 
-    // --- 個別回収サブタブ切り替え ---
+    // --- 個別回収 ---
     subTabBtns.forEach(btn => btn.addEventListener('click', () => {
-        subTabBtns.forEach(b => b.classList.remove('active')); 
-        btn.classList.add('active');
+        subTabBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active');
         const target = btn.getAttribute('data-target');
-        subTabContents.forEach(content => {
-            content.classList.toggle('active', content.id === target);
-        });
+        subTabContents.forEach(c => c.classList.toggle('active', c.id === target));
         renderSpecialCollectionsList();
     }));
 
@@ -247,14 +222,14 @@ document.addEventListener('DOMContentLoaded', () => {
         saveAppData(); renderSpecialCollectionsList(); renderCalendar(currentCalendarDate);
     };
 
-    // --- ルール設定 (復旧：セグメントボタン・曜日グリッド) ---
+    // --- ルール設定 (トグリスイッチ HTML構造復活) ---
     function renderRuleList() {
         ruleList.innerHTML = '';
         const data = getCurrentLocationData();
         if (!data || !data.trashRules) return;
-
         data.trashRules.forEach(rule => {
             const card = document.createElement('div'); card.className = 'rule-card card';
+            // トグリスイッチ用のHTML構造を確実に適用
             card.innerHTML = `
                 <div class="rule-card-header">
                     <div class="trash-color-circle" style="background-color: ${rule.color};"></div>
@@ -282,6 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 expandIcon.textContent = isHidden ? 'expand_more' : 'expand_less';
                 if (!isHidden) renderCycleDetails(details.querySelector('.cycle-details'), rule);
             });
+            // トグリスイッチの変更イベント
             card.querySelector('.toggle-switch input').addEventListener('change', (e) => {
                 rule.active = e.target.checked; saveAppData(); renderCalendar(currentCalendarDate);
             });
