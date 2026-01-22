@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ごみ捨て特化型PWAアプリ</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
@@ -17,7 +17,7 @@
     <header class="app-header">
         <h1 id="screen-title">カレンダー</h1>
         <div id="locationSwitcher" class="location-switcher">
-            <label for="currentLocationSelect">表示中の場所:</label>
+            <span class="material-icons">place</span>
             <select id="currentLocationSelect" name="current_location" aria-label="表示中の場所"></select>
         </div>
     </header>
@@ -30,10 +30,12 @@
                 <h2 id="currentMonth"></h2>
                 <button id="nextMonthBtn" class="month-nav-btn"><span class="material-icons">chevron_right</span></button>
             </div>
-            <div class="calendar-grid">
-                <div class="day-label">月</div><div class="day-label">火</div><div class="day-label">水</div><div class="day-label">木</div><div class="day-label">金</div><div class="day-label">土</div><div class="day-label">日</div>
+            <div class="calendar-grid-wrapper">
+                <div class="calendar-grid labels">
+                    <div class="day-label">月</div><div class="day-label">火</div><div class="day-label">水</div><div class="day-label">木</div><div class="day-label">金</div><div class="day-label">土</div><div class="day-label">日</div>
+                </div>
+                <div id="calendarDays" class="calendar-grid days"></div>
             </div>
-            <div id="calendarDays" class="calendar-grid days"></div>
             <div id="calendarLegend" class="calendar-legend"></div>
         </section>
 
@@ -46,46 +48,36 @@
 
             <div id="bulk_waste_form" class="sub-tab-content active">
                 <h3>粗大ごみ登録</h3>
-                <label for="bulk_date">日付選択:</label>
-                <input type="date" id="bulk_date">
-                <label for="bulk_item">品目:</label>
-                <input type="text" id="bulk_item" placeholder="例: ベッド、自転車">
-                <label for="bulk_amount">金額(円):</label>
-                <input type="number" id="bulk_amount" placeholder="400">
-                <label for="bulk_count">枚数:</label>
-                <input type="number" id="bulk_count" value="1">
-                <button class="primary-btn" id="registerBulkWasteBtn">登録</button>
+                <div class="input-group">
+                    <label>日付</label><input type="date" id="bulk_date">
+                    <label>品目</label><input type="text" id="bulk_item" placeholder="例: ベッド、自転車">
+                    <div class="row-inputs">
+                        <div class="col"><label>金額(円)</label><input type="number" id="bulk_amount" placeholder="400"></div>
+                        <div class="col"><label>枚数</label><input type="number" id="bulk_count" value="1"></div>
+                    </div>
+                    <button class="primary-btn" id="registerBulkWasteBtn">登録する</button>
+                </div>
                 <div class="registered-list-section">
-                    <h3>登録済みの粗大ごみ</h3>
+                    <h4>登録リスト</h4>
                     <div id="bulkWasteList" class="registered-list"></div>
                 </div>
             </div>
 
             <div id="reusable_form" class="sub-tab-content">
                 <h3>不用品回収登録</h3>
-                <label for="reusable_date">日付選択:</label>
-                <input type="date" id="reusable_date">
-                <label for="reusable_item">品目:</label>
-                <input type="text" id="reusable_item" placeholder="例: 古着、小型家電">
-                <label>回収時間:</label>
-                <div class="time-select-wrapper">
-                    <select id="reusable_time_hour" aria-label="回収時間の時">
-                        <option value="06">06</option><option value="07">07</option><option value="08" selected>08</option>
-                        <option value="09">09</option><option value="10">10</option><option value="11">11</option>
-                        <option value="12">12</option><option value="13">13</option><option value="14">14</option>
-                        <option value="15">15</option><option value="16">16</option><option value="17">17</option>
-                        <option value="18">18</option><option value="19">19</option><option value="20">20</option>
-                    </select>
-                    <span>:</span>
-                    <select id="reusable_time_minute" aria-label="回収時間の分">
-                        <option value="00">00</option><option value="10">10</option>
-                        <option value="20">20</option><option value="30">30</option>
-                        <option value="40">40</option><option value="50">50</option>
-                    </select>
+                <div class="input-group">
+                    <label>日付</label><input type="date" id="reusable_date">
+                    <label>品目</label><input type="text" id="reusable_item" placeholder="例: 古着、小型家電">
+                    <label>回収時間</label>
+                    <div class="time-select-wrapper">
+                        <select id="reusable_time_hour"><option value="06">06</option><option value="07">07</option><option value="08" selected>08</option><option value="09">09</option><option value="10">10</option></select>
+                        <span>:</span>
+                        <select id="reusable_time_minute"><option value="00">00</option><option value="15">15</option><option value="30">30</option><option value="45">45</option></select>
+                    </div>
+                    <button class="primary-btn" id="registerReusableBtn">登録する</button>
                 </div>
-                <button class="primary-btn" id="registerReusableBtn">登録</button>
                 <div class="registered-list-section">
-                    <h3>登録済みの不用品回収</h3>
+                    <h4>登録リスト</h4>
                     <div id="reusableList" class="registered-list"></div>
                 </div>
             </div>
@@ -93,51 +85,58 @@
 
         <!-- ルール設定画面 -->
         <section id="rules" class="screen">
-            <button class="add-rule-btn primary-btn">新しいゴミ種別を追加</button>
+            <button class="add-rule-btn primary-btn">
+                <span class="material-icons">add</span> 新しいゴミ種別を追加
+            </button>
             <div id="ruleList" class="rule-list"></div>
         </section>
 
         <!-- システム設定画面 -->
         <section id="settings" class="screen">
-            <h2>システム設定</h2>
-            <div id="locationManagement" class="setting-section">
-                <h3>場所の管理</h3>
-                <div id="locationList" class="location-list"></div>
-                <button id="addLocationBtn" class="primary-btn">新しい場所を追加</button>
-            </div>
-            <div class="setting-item">
-                <span>ダークモード:</span>
-                <div class="toggle-switch">
-                    <input type="checkbox" id="darkModeToggle">
-                    <label for="darkModeToggle"></label>
-                </div>
-            </div>
-            <div class="setting-item">
-                <button id="exportDataBtn" class="secondary-btn">データ書き出し</button>
-                <input type="file" id="importDataInput" accept=".json" style="display:none;">
-                <button id="importDataBtn" class="secondary-btn">データ読み込み</button>
-            </div>
-            <div class="backup-warning">⚠️ 定期的な『データ書き出し』を推奨します。</div>
-            <div class="danger-zone-wrapper">
-                <div class="toggle-switch-wrapper" style="margin-top: 30px; margin-bottom: 10px; display: flex; justify-content: center; align-items: center;">
-                    <span style="font-size: 0.9em; color: #777; margin-right: 10px;">高度な管理機能を表示</span>
-                    <div class="toggle-switch">
-                        <input type="checkbox" id="showDangerZoneToggle">
-                        <label for="showDangerZoneToggle"></label>
+            <div class="setting-group-container">
+                <div class="setting-card">
+                    <div class="section-header">
+                        <div class="header-title"><span class="material-icons">settings_applications</span><h3>アプリ設定</h3></div>
+                    </div>
+                    <div id="locationManagement" class="location-management-area">
+                        <label class="inner-label">場所の管理</label>
+                        <div id="locationList" class="location-list"></div>
+                        <button id="addLocationBtn" class="add-text-btn"><span class="material-icons">add_circle_outline</span><span>新しい場所を追加</span></button>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="setting-row">
+                        <div class="setting-info"><span class="material-icons">dark_mode</span><span>ダークモード</span></div>
+                        <div class="toggle-switch"><input type="checkbox" id="darkModeToggle"><label for="darkModeToggle"></label></div>
                     </div>
                 </div>
-                <div id="dangerZone" class="danger-zone" style="display: none;">
-                    <button id="resetAllDataBtn" class="danger-btn">全データを初期化</button>
+                <div class="setting-card tools">
+                    <div class="section-header">
+                        <div class="header-title"><span class="material-icons">storage</span><h3>データバックアップ</h3></div>
+                    </div>
+                    <div class="data-action-grid">
+                        <button id="exportDataBtn" class="tool-btn"><div class="icon-circle download"><span class="material-icons">download</span></div><span>書き出し</span></button>
+                        <button id="importDataBtn" class="tool-btn"><div class="icon-circle upload"><span class="material-icons">upload</span></div><span>読み込み</span></button>
+                        <input type="file" id="importDataInput" accept=".json" style="display:none;">
+                    </div>
+                </div>
+            </div>
+            <div class="danger-zone-wrapper">
+                <div class="toggle-switch-wrapper">
+                    <span class="hint-text">高度な管理機能を表示</span>
+                    <div class="toggle-switch small"><input type="checkbox" id="showDangerZoneToggle"><label for="showDangerZoneToggle"></label></div>
+                </div>
+                <div id="dangerZone" class="danger-zone hidden">
+                    <button id="resetAllDataBtn" class="danger-btn-outline"><span class="material-icons">auto_delete</span><span>全データを初期化</span></button>
                 </div>
             </div>
         </section>
     </main>
 
     <nav class="app-navigation">
-        <button class="nav-item active" data-screen="calendar"><span class="material-icons">calendar_month</span><span>カレンダー</span></button>
-        <button class="nav-item" data-screen="special_collect"><span class="material-icons">add_box</span><span>個別回収</span></button>
-        <button class="nav-item" data-screen="rules"><span class="material-icons">format_list_bulleted</span><span>ルール設定</span></button>
-        <button class="nav-item" data-screen="settings"><span class="material-icons">settings</span><span>システム</span></button>
+        <button class="nav-item active" data-screen="calendar"><span class="material-icons">calendar_today</span><span>カレンダー</span></button>
+        <button class="nav-item" data-screen="special_collect"><span class="material-icons">local_shipping</span><span>個別回収</span></button>
+        <button class="nav-item" data-screen="rules"><span class="material-icons">list_alt</span><span>ルール設定</span></button>
+        <button class="nav-item" data-screen="settings"><span class="material-icons">tune</span><span>システム</span></button>
     </nav>
     <script src="script.js"></script>
 </body>
