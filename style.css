@@ -1,85 +1,79 @@
 /* ===============================================
-   ベーススタイル
+   ベーススタイル：フォントと背景を柔らかく
    =============================================== */
 body {
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans JP', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f0f2f5; /* アプリ全体の背景色 */
-    color: #333;
+    background-color: #f7f9fc;
+    color: #444;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
 /* ===============================================
-   ヘッダー & 場所切り替え
+   ヘッダー
    =============================================== */
 .app-header {
-    background-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.95);
     padding: 15px 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
     text-align: center;
     position: sticky;
     top: 0;
     z-index: 1000;
+    backdrop-filter: blur(10px);
 }
 
 .app-header h1 {
     margin: 0;
-    font-size: 1.2em;
-    color: #555;
+    font-size: 1.1em;
+    color: #333;
+    font-weight: 700;
+    letter-spacing: 0.05em;
 }
 
-/* 場所切り替えドロップダウン */
 .location-switcher {
-    text-align: right;
-    margin-top: 10px;
+    text-align: center;
+    margin-top: 8px;
 }
 
 .location-switcher label {
-    font-size: 0.9em;
-    color: #777;
+    font-size: 0.8em;
+    color: #888;
     margin-right: 5px;
-    font-weight: normal;
 }
 
 .location-switcher select {
-    padding: 5px 10px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    background-color: #f9f9f9;
-    font-size: 0.9em;
-    color: #333;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    /* 下矢印アイコンのSVG */
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23777%22%20d%3D%22M7%2C10L12%2C15L17%2C10H7Z%22%20%2F%3E%3C%2Fsvg%3E");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    background-size: 12px;
-    padding-right: 25px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid #eee;
+    background-color: #f0f4f8;
+    font-size: 0.85em;
+    color: #555;
+    font-weight: bold;
     cursor: pointer;
+    outline: none;
 }
 
 /* ===============================================
-   メインコンテンツエリア & 画面切り替え
+   メインコンテンツ
    =============================================== */
 .app-main {
     flex-grow: 1;
     padding: 20px;
     overflow-y: auto;
+    padding-bottom: 80px;
 }
 
-.screen {
-    display: none;
-}
+.screen { display: none; }
+.screen.active { display: block; animation: fadeIn 0.3s ease; }
 
-.screen.active {
-    display: block;
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* ===============================================
@@ -90,12 +84,14 @@ body {
     justify-content: space-around;
     align-items: center;
     background-color: #ffffff;
-    box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
-    padding: 10px 0;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.03);
+    padding: 12px 0 25px 0;
     position: sticky;
     bottom: 0;
     width: 100%;
     z-index: 1000;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
 }
 
 .nav-item {
@@ -106,82 +102,102 @@ body {
     justify-content: center;
     border: none;
     background: none;
-    color: #888;
-    font-size: 0.7em;
+    color: #aaa;
+    font-size: 0.65em;
     padding: 5px 0;
     cursor: pointer;
-    transition: color 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .nav-item .material-icons {
-    font-size: 24px;
-    margin-bottom: 2px;
+    font-size: 26px;
+    margin-bottom: 4px;
+    transition: transform 0.2s;
 }
 
 .nav-item.active {
     color: #6a9cff;
 }
 
-.nav-item:focus {
-    outline: none;
+.nav-item.active .material-icons {
+    transform: translateY(-2px);
 }
 
 /* ===============================================
-   共通コンポーネント (ボタン, 入力, トグル)
+   共通コンポーネント
    =============================================== */
-.primary-btn, .secondary-btn {
-    padding: 10px 15px;
-    border-radius: 8px;
+.primary-btn, .secondary-btn, .danger-btn {
+    padding: 14px 20px;
+    border-radius: 12px;
     border: none;
     font-size: 1em;
+    font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s ease;
     margin-top: 15px;
+    width: 100%;
+    display: block;
+    box-sizing: border-box;
+    transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.primary-btn:active, .secondary-btn:active, .danger-btn:active {
+    transform: scale(0.97);
 }
 
 .primary-btn {
-    background-color: #6a9cff;
+    background: linear-gradient(135deg, #6a9cff, #5a8cff);
     color: white;
-}
-
-.primary-btn:hover {
-    background-color: #4a8bff;
+    box-shadow: 0 4px 10px rgba(106, 156, 255, 0.3);
 }
 
 .secondary-btn {
-    background-color: #e0e0e0;
-    color: #555;
+    background-color: #eef2f6;
+    color: #666;
 }
 
-.secondary-btn:hover {
-    background-color: #d0d0d0;
+.danger-btn {
+    background-color: #ff6b6b;
+    color: white;
+    box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
 }
 
 input[type="text"],
 input[type="number"],
 input[type="date"],
 input[type="time"] {
-    width: calc(100% - 20px);
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 10px;
     font-size: 1em;
+    background-color: #eef2f6;
+    color: #333;
+    box-sizing: border-box;
+    transition: background-color 0.2s;
+}
+
+input:focus {
+    background-color: #e3e8ee;
+    outline: none;
 }
 
 label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-weight: bold;
-    color: #555;
+    font-size: 0.9em;
+    color: #666;
 }
 
-/* トグルスイッチ */
+/* ===============================================
+   トグルスイッチ：黄金比バランス版
+   =============================================== */
 .toggle-switch {
     position: relative;
     display: inline-block;
-    width: 45px;
-    height: 25px;
+    width: 52px;  /* 全体の幅 */
+    height: 32px; /* 全体の高さ */
     margin-left: 10px;
     vertical-align: middle;
 }
@@ -192,6 +208,7 @@ label {
     height: 0;
 }
 
+/* 背景（トラック部分） */
 .toggle-switch label {
     cursor: pointer;
     position: absolute;
@@ -199,34 +216,39 @@ label {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-    border-radius: 25px;
+    background-color: #e4e4e4; /* OFFの色（少し上品なグレー） */
+    transition: .4s;           /* 少しゆっくり動くようにして高級感を出す */
+    border-radius: 34px;       /* 角丸を滑らかに */
 }
 
+/* つまみ（白い丸部分） */
 .toggle-switch label:before {
     position: absolute;
     content: "";
-    height: 20px;
-    width: 20px;
-    left: 3px;
-    bottom: 2.5px;
+    height: 24px; /* 丸のサイズ */
+    width: 24px;  /* 丸のサイズ */
+    left: 4px;    /* 左の余白 */
+    bottom: 4px;  /* 下の余白 */
+    /* ↑ 高さ32px - 丸24px = 残り8px。上下に4pxずつ配分されるので、bottom:4pxで垂直中央になります */
+    
     background-color: white;
-    -webkit-transition: .4s;
     transition: .4s;
     border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 立体感 */
 }
 
+/* ONになった時の背景色 */
 .toggle-switch input:checked + label {
     background-color: #6a9cff;
 }
 
+/* ONになった時の移動 */
 .toggle-switch input:checked + label:before {
-    -webkit-transform: translateX(20px);
-    -ms-transform: translateX(20px);
+    /* 移動距離計算：幅52px - (左余白4px + 右余白4px + 丸24px) = 残り20px */
+    /* 元の位置から20px動かせば、右側もきっちり4px空きます */
     transform: translateX(20px);
 }
+/* ------------------------------------------ */
 
 /* ===============================================
    カレンダー画面
@@ -236,18 +258,23 @@ label {
     justify-content: space-between;
     align-items: center;
     padding: 10px 0;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 
 .calendar-header h2 {
-    font-size: 1.3em;
-    margin: 0;
+    font-size: 1.4em;
+    color: #333;
 }
 
 .month-nav-btn {
-    background: none;
+    background: #f0f4f8;
     border: none;
-    font-size: 1.5em;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     color: #6a9cff;
 }
@@ -255,689 +282,424 @@ label {
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
+    gap: 8px;
     text-align: center;
 }
 
 .day-label {
+    font-size: 0.85em;
     font-weight: bold;
-    color: #777;
-    padding: 8px 0;
+    color: #999;
+    padding-bottom: 10px;
 }
 
 .calendar-grid.days .day-cell {
     background-color: #ffffff;
-    border-radius: 8px;
-    padding: 10px 5px;
-    min-height: 70px;
+    border-radius: 12px;
+    padding: 5px;
+    min-height: 75px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     position: relative;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    border: 1px solid transparent;
 }
 
 .calendar-grid.days .day-cell.inactive {
-    background-color: #f8f8f8;
-    color: #bbb;
+    background-color: transparent;
+    box-shadow: none;
+    color: #ddd;
 }
 
 .calendar-grid.days .day-cell.today {
+    background-color: #fff;
     border: 2px solid #6a9cff;
+    box-shadow: 0 4px 12px rgba(106, 156, 255, 0.2);
 }
 
 .calendar-grid.days .day-cell .day-number {
-    font-size: 1.1em;
+    font-size: 1em;
     font-weight: bold;
-    margin-bottom: 5px;
-    color: #333;
+    margin-bottom: 4px;
+    color: #444;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 50%;
 }
 
-.calendar-grid.days .day-cell.inactive .day-number {
-    color: #bbb;
+.calendar-grid.days .day-cell.today .day-number {
+    background-color: #6a9cff;
+    color: white;
 }
 
 .trash-icon {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 0.7em;
     color: white;
-    margin: 2px;
+    margin: 2px 1px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/*  不用品回収用のアイコン（角丸四角・特別色） */
 .trash-icon.special-reusable {
-    border-radius: 4px; /* 四角 */
-    background-color: #e67e22 !important; /* キャロットオレンジ */
-    box-shadow: 0 2px 4px rgba(230, 126, 34, 0.3);
+    border-radius: 6px;
+    background-color: #e67e22 !important;
+    box-shadow: 0 2px 5px rgba(230, 126, 34, 0.4);
     font-weight: bold;
-}
-
-/* ===============================================
-   個別回収画面 & リスト表示
-   =============================================== */
-.sub-tabs {
-    display: flex;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #eee;
-}
-
-.sub-tab-btn {
-    flex: 1;
-    padding: 12px 0;
-    border: none;
-    background: none;
-    font-size: 1em;
-    cursor: pointer;
-    color: #777;
-    position: relative;
-    transition: color 0.3s ease;
-}
-
-.sub-tab-btn.active {
-    color: #6a9cff;
-}
-
-.sub-tab-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: #6a9cff;
-}
-
-.sub-tab-content {
-    display: none;
-    padding: 15px 0;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    padding: 20px;
-}
-
-.sub-tab-content.active {
-    display: block;
-}
-
-.sub-tab-content h3 {
-    margin-top: 0;
-    color: #555;
-}
-
-/* 登録済みリスト表示セクション */
-.registered-list-section {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px dashed #eee;
-}
-
-.registered-list-section h3 {
-    font-size: 1.1em;
-    color: #555;
-    margin-bottom: 15px;
-}
-
-.registered-list .list-item {
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    padding: 12px 15px;
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-}
-
-.registered-list .list-item:last-child {
-    margin-bottom: 0;
-}
-
-.registered-list .item-details {
-    flex-grow: 1;
-    text-align: left;
-}
-
-.registered-list .item-details .item-name {
-    font-weight: bold;
-    color: #333;
-    font-size: 1em;
-}
-
-.registered-list .item-details .item-meta {
-    font-size: 0.85em;
-    color: #777;
-}
-
-.registered-list .item-actions {
-    display: flex;
-    gap: 5px;
-}
-
-.registered-list .item-actions button {
-    background: none;
-    border: none;
-    color: #6a9cff;
-    cursor: pointer;
-    font-size: 0.9em;
-    padding: 5px;
-    border-radius: 5px;
-    transition: background-color 0.2s ease;
-}
-
-.registered-list .item-actions button:hover {
-    background-color: #e6f0ff;
-}
-
-.registered-list .item-actions .delete-btn {
-    color: #ff6b6b;
-}
-
-.registered-list .item-actions .delete-btn:hover {
-    background-color: #ffe6e6;
-}
-
-/* ===============================================
-   ルール設定画面
-   =============================================== */
-.add-rule-btn {
-    display: block;
-    width: calc(100% - 20px);
-    margin: 0 auto 20px auto;
-    text-align: center;
-}
-
-.rule-list {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    overflow: hidden;
-}
-
-.rule-card {
-    border-bottom: 1px solid #eee;
-    padding: 15px 20px;
-    cursor: grab;
-    transition: background-color 0.2s ease;
-}
-
-.rule-card:last-child {
-    border-bottom: none;
-}
-
-.rule-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.rule-card-header .drag-handle {
-    color: #bbb;
-    margin-right: 10px;
-    cursor: grab;
-}
-
-.trash-color-circle {
     width: 20px;
     height: 20px;
-    border-radius: 50%;
-    margin-right: 10px;
-    border: 1px solid rgba(0,0,0,0.1);
 }
 
-.rule-name {
-    flex-grow: 1;
-    font-weight: bold;
-    font-size: 1.1em;
-    color: #333;
-}
-
-.rule-card-header .toggle-switch {
-    margin-right: 10px;
-}
-
-.expand-btn {
-    background: none;
-    border: none;
-    color: #777;
-    cursor: pointer;
-    padding: 0;
-    margin-left: 10px;
-}
-
-.expand-btn .material-icons {
-    transition: transform 0.3s ease;
-}
-
-.expand-btn.expanded .material-icons {
-    transform: rotate(180deg);
-}
-
-.rule-card-details {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px dashed #eee;
-    font-size: 0.9em;
-}
-
-.rule-card-details.hidden {
-    display: none;
-}
-
-.cycle-selector {
-    display: flex;
-    margin-bottom: 15px;
-    background-color: #f0f0f0;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.cycle-selector .segment-btn {
-    flex: 1;
-    padding: 10px 5px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 0.9em;
-    color: #555;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.cycle-selector .segment-btn.active {
-    background-color: #6a9cff;
-    color: white;
-}
-
-.logic-options label {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-    font-weight: normal;
-    color: #555;
-}
-
-.logic-options input[type="checkbox"] {
-    margin-right: 8px;
-    transform: scale(1.1);
-}
-
-.logic-options input[type="time"] {
-    width: 100px;
-    margin-top: 5px;
-    margin-bottom: 15px;
-    display: block;
-}
-
-.delete-rule-btn {
-    background-color: #ff6b6b;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9em;
-    display: block;
-    margin-top: 15px;
-}
-
-/* ===============================================
-   システム設定画面 & 場所管理
-   =============================================== */
-.setting-section {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    padding: 15px 20px;
-    margin-bottom: 15px;
-}
-
-.setting-section h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #555;
-    font-size: 1.1em;
-}
-
-.setting-item {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    padding: 15px 20px;
-    margin-bottom: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.setting-item label {
-    margin-bottom: 0;
-    flex-grow: 1;
-}
-
-.setting-item input[type="text"] {
-    width: auto;
-    flex-grow: 1;
-    margin-bottom: 0;
-    margin-left: 10px;
-}
-
-.setting-item button {
-    margin-top: 0;
-    margin-left: 10px;
-}
-
-/* 場所管理リスト */
-.location-list .location-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.location-list .location-item:last-child {
-    border-bottom: none;
-}
-
-.location-list .location-item input[type="text"] {
-    flex-grow: 1;
-    margin-bottom: 0;
-    border: none;
-    padding: 5px 0;
-    background: transparent;
-}
-
-.location-list .location-item button {
-    margin-left: 10px;
-    padding: 5px 10px;
-    font-size: 0.8em;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.location-list .location-item .delete-btn {
-    background-color: #ff6b6b;
-    color: white;
-    border: none;
-}
-
-.location-list .location-item .delete-btn:hover {
-    background-color: #ff4747;
-}
-
-.add-location-btn {
-    display: block;
-    width: 100%;
-    margin-top: 20px;
-    text-align: center;
-}
-
-/* ===============================================
-   ダークモードスタイル
-   =============================================== */
-body.dark-mode {
-    background-color: #2c2c2c;
-    color: #f0f0f0;
-}
-
-body.dark-mode .app-header,
-body.dark-mode .app-navigation,
-body.dark-mode .screen,
-body.dark-mode .sub-tab-content,
-body.dark-mode .rule-list,
-body.dark-mode .rule-card,
-body.dark-mode .setting-item,
-body.dark-mode .setting-section {
-    background-color: #3a3a3a;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    border-color: #4a4a4a;
-}
-
-body.dark-mode .app-header h1,
-body.dark-mode .app-navigation .nav-item,
-body.dark-mode h2,
-body.dark-mode h3,
-body.dark-mode label,
-body.dark-mode .day-label,
-body.dark-mode .day-cell .day-number,
-body.dark-mode .rule-name,
-body.dark-mode .sub-tab-btn {
-    color: #e0e0e0;
-}
-
-body.dark-mode .month-nav-btn,
-body.dark-mode .nav-item.active,
-body.dark-mode .sub-tab-btn.active::after,
-body.dark-mode .toggle-switch input:checked + label,
-body.dark-mode .cycle-selector .segment-btn.active {
-    color: #a0c0ff;
-    background-color: #a0c0ff;
-}
-
-body.dark-mode .primary-btn {
-    background-color: #a0c0ff;
-}
-
-body.dark-mode .primary-btn:hover {
-    background-color: #80a0ff;
-}
-
-body.dark-mode .secondary-btn {
-    background-color: #5a5a5a;
-    color: #e0e0e0;
-}
-
-body.dark-mode .secondary-btn:hover {
-    background-color: #6a6a6a;
-}
-
-body.dark-mode input[type="text"],
-body.dark-mode input[type="number"],
-body.dark-mode input[type="date"],
-body.dark-mode input[type="time"] {
-    background-color: #4a4a4a;
-    border-color: #666;
-    color: #f0f0f0;
-}
-
-body.dark-mode .calendar-grid.days .day-cell.inactive {
-    background-color: #3a3a3a;
-    color: #999;
-}
-
-body.dark-mode .calendar-grid.days .day-cell.inactive .day-number {
-    color: #999;
-}
-
-body.dark-mode .rule-card {
-    border-bottom-color: #4a4a4a;
-}
-
-body.dark-mode .rule-card-details {
-    border-top-color: #4a4a4a;
-}
-
-body.dark-mode .cycle-selector {
-    background-color: #4a4a4a;
-}
-
-body.dark-mode .cycle-selector .segment-btn {
-    color: #e0e0e0;
-}
-
-body.dark-mode .toggle-switch label {
-    background-color: #555;
-}
-
-body.dark-mode .toggle-switch label:before {
-    background-color: #ccc;
-}
-
-/* ダークモード：場所切り替え */
-body.dark-mode .location-switcher select {
-    background-color: #4a4a4a;
-    border-color: #666;
-    color: #f0f0f0;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23e0e0e0%22%20d%3D%22M7%2C10L12%2C15L17%2C10H7Z%22%20%2F%3E%3C%2Fsvg%3E");
-}
-
-body.dark-mode .location-switcher label {
-    color: #e0e0e0;
-}
-
-/* ダークモード：リスト表示 */
-body.dark-mode .registered-list-section {
-    border-top-color: #4a4a4a;
-}
-body.dark-mode .registered-list-section h3 {
-    color: #e0e0e0;
-}
-body.dark-mode .registered-list .list-item {
-    background-color: #4a4a4a;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-body.dark-mode .registered-list .item-details .item-name {
-    color: #f0f0f0;
-}
-body.dark-mode .registered-list .item-details .item-meta {
-    color: #bbb;
-}
-body.dark-mode .registered-list .item-actions button {
-    color: #a0c0ff;
-}
-body.dark-mode .registered-list .item-actions button:hover {
-    background-color: #5a5a5a;
-}
-body.dark-mode .registered-list .item-actions .delete-btn {
-    color: #ff8e8e;
-}
-body.dark-mode .registered-list .item-actions .delete-btn:hover {
-    background-color: #6a4a4a;
-}
-
-/* ダークモード：場所管理 */
-body.dark-mode .setting-section h3 {
-    color: #e0e0e0;
-}
-
-body.dark-mode .location-list .location-item input[type="text"] {
-    color: #f0f0f0;
-}
-
-body.dark-mode .location-list .location-item {
-    border-bottom-color: #4a4a4a;
-}
-
-/* 1. カレンダー凡例エリア */
 .calendar-legend {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 15px;
-    margin-top: 15px;
-    padding: 10px;
-    background-color: #fcfcfc;
-    border-radius: 8px;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
 }
 
 .legend-item {
     display: flex;
     align-items: center;
     font-size: 0.8em;
-    color: #555;
+    color: #666;
+    background: #f7f9fc;
+    padding: 4px 10px;
+    border-radius: 20px;
 }
 
 .legend-item .trash-color-circle {
-    width: 12px;
-    height: 12px;
-    margin-right: 5px;
-    border: none; /* 凡例用は枠線なし */
+    width: 10px;
+    height: 10px;
+    margin-right: 6px;
+    border-radius: 50%;
 }
 
-/* 2. 時間選択セレクトボックス */
+/* ===============================================
+   個別回収画面
+   =============================================== */
+.sub-tabs {
+    display: flex;
+    background: #eef2f6;
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    border: none;
+}
+
+.sub-tab-btn {
+    flex: 1;
+    padding: 10px 0;
+    border: none;
+    background: transparent;
+    font-size: 0.95em;
+    font-weight: bold;
+    cursor: pointer;
+    color: #888;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.sub-tab-btn.active {
+    background-color: #fff;
+    color: #6a9cff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.sub-tab-btn.active::after { content: none; }
+
+.sub-tab-content {
+    display: none;
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+.sub-tab-content.active { display: block; }
+
+.sub-tab-content h3 {
+    margin-top: 0;
+    color: #333;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
 .time-select-wrapper {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .time-select-wrapper select {
     width: auto;
     flex-grow: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 1em;
-    background-color: #fff;
+    padding: 12px;
+    border: none;
+    background-color: #eef2f6;
+    border-radius: 10px;
+    font-size: 1.1em;
 }
 
-.time-select-wrapper span {
+.time-select-wrapper span { font-weight: bold; color: #aaa; }
+
+.registered-list-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px dashed #eee;
+}
+
+.registered-list-section h3 {
+    font-size: 1em;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.registered-list .list-item {
+    background-color: #fff;
+    border: 1px solid #f0f0f0;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+}
+
+.registered-list .item-details .item-name {
     font-weight: bold;
+    color: #333;
+    font-size: 1.05em;
+    margin-bottom: 4px;
+}
+
+.registered-list .item-actions button {
+    background: #f0f4f8;
+    border: none;
+    color: #6a9cff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+    transition: background 0.2s;
+}
+
+.registered-list .item-actions button:hover { background-color: #e0e7ff; }
+.registered-list .item-actions .delete-btn { color: #ff6b6b; }
+.registered-list .item-actions .delete-btn:hover { background-color: #ffe0e0; }
+
+/* ===============================================
+   ルール設定画面
+   =============================================== */
+.rule-list {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.rule-card {
+    background-color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 15px 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    cursor: grab;
+    transition: transform 0.2s;
+}
+
+.rule-card:active { transform: scale(0.98); }
+
+.trash-color-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 12px;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.cycle-selector {
+    background-color: #eef2f6;
+    border-radius: 12px;
+    padding: 4px;
+}
+
+.cycle-selector .segment-btn {
+    border-radius: 8px;
+    padding: 8px;
+    color: #666;
+    font-size: 0.85em;
+}
+
+.cycle-selector .segment-btn.active {
+    background-color: #fff;
+    color: #6a9cff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* ===============================================
+   システム設定画面
+   =============================================== */
+.setting-section {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.setting-item {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.location-list .location-item {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 12px 0;
+}
+
+.location-list .location-item input[type="text"] {
+    margin-bottom: 0;
+    background: transparent;
+    padding: 5px;
+    font-weight: bold;
+}
+
+.backup-warning {
+    background-color: #fff8e1;
+    color: #8d6e63;
+    border: none;
+    padding: 20px;
+    border-radius: 16px;
+    font-size: 0.9em;
+    margin-bottom: 30px;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.danger-zone {
+    margin-top: 20px;
+    padding: 20px;
+    background: #fff0f0;
+    border-radius: 16px;
+    border: none;
+}
+
+/* ===============================================
+   ダークモードスタイル
+   =============================================== */
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+body.dark-mode .app-header,
+body.dark-mode .app-navigation {
+    background-color: rgba(40, 40, 40, 0.95);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+body.dark-mode .app-header h1 { color: #f0f0f0; }
+
+body.dark-mode .location-switcher select {
+    background-color: #333;
+    border-color: #444;
+    color: #eee;
+}
+
+body.dark-mode .month-nav-btn {
+    background-color: #333;
+    color: #8ab4f8;
+}
+
+body.dark-mode .calendar-grid.days .day-cell {
+    background-color: #2a2a2a;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+body.dark-mode .calendar-grid.days .day-cell.inactive {
+    background-color: transparent;
+    box-shadow: none;
     color: #555;
 }
 
-/* 3. バックアップ警告 */
-.backup-warning {
-    background-color: #fff3cd; /* 薄い黄色 */
-    color: #856404; /* 濃い黄色文字 */
-    border: 1px solid #ffeeba;
-    padding: 15px;
-    border-radius: 8px;
-    font-size: 0.85em;
-    margin-bottom: 20px;
-    line-height: 1.5;
+body.dark-mode .calendar-grid.days .day-cell.today {
+    background-color: #2a2a2a;
+    border-color: #8ab4f8;
 }
 
-/* 4. 危険エリア（初期化ボタン） */
-.danger-zone {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid #ddd;
-    text-align: center;
-}
-
-.danger-btn {
-    background-color: #ff4d4d; /* 赤色 */
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1em;
-    width: 100%;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.danger-btn:hover {
-    background-color: #e60000;
-}
-
-/* ダークモード対応 */
 body.dark-mode .calendar-legend {
-    background-color: #444;
+    background-color: #2a2a2a;
 }
+
 body.dark-mode .legend-item {
-    color: #ddd;
+    background-color: #333;
+    color: #ccc;
 }
+
+body.dark-mode .sub-tabs { background-color: #333; }
+body.dark-mode .sub-tab-btn.active { background-color: #444; color: #8ab4f8; }
+body.dark-mode .sub-tab-content { background-color: #2a2a2a; }
+body.dark-mode .sub-tab-content h3 { color: #eee; }
+
+body.dark-mode input[type="text"],
+body.dark-mode input[type="number"],
+body.dark-mode input[type="date"],
+body.dark-mode input[type="time"],
 body.dark-mode .time-select-wrapper select {
-    background-color: #4a4a4a;
-    color: #f0f0f0;
-    border-color: #666;
+    background-color: #333;
+    color: #eee;
 }
-body.dark-mode .time-select-wrapper span {
-    color: #ddd;
+
+body.dark-mode .registered-list .list-item {
+    background-color: #2a2a2a;
+    border-color: #333;
 }
+
+body.dark-mode .registered-list .item-details .item-name { color: #eee; }
+body.dark-mode .registered-list .item-actions button { background-color: #333; }
+
+body.dark-mode .rule-card { background-color: #2a2a2a; }
+body.dark-mode .cycle-selector { background-color: #333; }
+body.dark-mode .cycle-selector .segment-btn.active { background-color: #444; color: #8ab4f8; }
+
+body.dark-mode .setting-item,
+body.dark-mode .setting-section {
+    background-color: #2a2a2a;
+}
+
 body.dark-mode .backup-warning {
-    background-color: #4d4d00;
-    color: #ffffcc;
-    border-color: #666600;
+    background-color: #3e2723;
+    color: #ffccbc;
 }
+
 body.dark-mode .danger-zone {
-    border-top-color: #555;
+    background-color: #2c0b0e;
 }

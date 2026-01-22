@@ -1,4 +1,6 @@
-const CACHE_NAME = 'trash-app-cache-v1';
+// バージョンを更新して、ブラウザに新しいSWだと認識させる
+const CACHE_NAME = 'trash-app-cache-v3-dev'; 
+
 const urlsToCache = [
     '/',
     '/index.html',
@@ -6,12 +8,9 @@ const urlsToCache = [
     '/script.js',
     '/manifest.json',
     'https://fonts.googleapis.com/icon?family=Material+Icons'
-    // 必要に応じてアイコン画像やその他のリソースを追加
-    // '/icons/icon-192x192.png',
-    // '/icons/icon-512x512.png'
 ];
 
-// インストールイベント: キャッシュにリソースを追加
+// インストールイベント: 基本ファイルのみキャッシュ（オフライン用）
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
@@ -20,37 +19,11 @@ self.addEventListener('install', (event) => {
                 return cache.addAll(urlsToCache);
             })
     );
+    // 待機状態をスキップして即座にアクティブにする
+    self.skipWaiting();
 });
 
-// フェッチイベント: キャッシュからリソースを提供
-self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request)
-            .then((response) => {
-                // キャッシュに見つかったらそれを返す
-                if (response) {
-                    return response;
-                }
-                // 見つからなかった場合はネットワークからフェッチ
-                return fetch(event.request).then(
-                    (response) => {
-                        // 有効なレスポンスであればキャッシュに追加
-                        if (!response || response.status !== 200 || response.type !== 'basic') {
-                            return response;
-                        }
-                        const responseToCache = response.clone();
-                        caches.open(CACHE_NAME)
-                            .then((cache) => {
-                                cache.put(event.request, responseToCache);
-                            });
-                        return response;
-                    }
-                );
-            })
-    );
-});
-
-// アクティベートイベント: 古いキャッシュを削除
+// アクティベートイベント: 古いキャッシュを即削除
 self.addEventListener('activate', (event) => {
     const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
@@ -62,53 +35,76 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             );
+        }).then(() => {
+            // クライアント（開いているページ）を即座に制御下に置く
+            return self.clients.claim();
         })
     );
 });
 
-// プッシュ通知の受信イベント
+// フェッチイベント: 戦略を「Network First」に変更
+self.addEventListener('fetch', (event) => {
+    const request = event.request;
+    const url = new URL(request.url);
+
+    // 1. 画像やフォントファイルは「Cache First（キャッシュ優先）」
+    //    （変更頻度が低く、重いため）
+    if (request.destination === 'image' || request.destination === 'font' || url.pathname.match(/\.(png|jpg|jpeg|svg|gif)$/)) {
+        event.respondWith(
+            caches.match(request).then((response) => {
+                // キャッシュにあればそれを返す、なければネットワークへ
+                return response || fetch(request).then((networkResponse) => {
+                    return caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(request, networkResponse.clone());
+                        return networkResponse;
+                    });
+                });
+            })
+        );
+        return;
+    }
+
+    // 2. HTML, CSS, JS などは「Network First（ネットワーク優先）」
+    //    （開発中の変更を即座に反映させるため）
+    event.respondWith(
+        fetch(request)
+            .then((networkResponse) => {
+                // ネットワークから正常に取得できた場合
+                if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+                    return networkResponse;
+                }
+
+                // 次回オフライン時のために、最新版をキャッシュに保存しておく
+                const responseToCache = networkResponse.clone();
+                caches.open(CACHE_NAME).then((cache) => {
+                    cache.put(request, responseToCache);
+                });
+
+                return networkResponse;
+            })
+            .catch(() => {
+                // ネットワークエラー（オフライン）の時はキャッシュを使用
+                console.log('Network failed, falling back to cache');
+                return caches.match(request);
+            })
+    );
+});
+
+// プッシュ通知の受信イベント（変更なし）
 self.addEventListener('push', (event) => {
     const data = event.data ? event.data.json() : { title: 'ゴミ出し通知', body: 'ゴミ出しの日です！' };
-
     const options = {
         body: data.body,
-        icon: data.icon || '/icons/icon-192x192.png', // 通知アイコン
-        badge: data.badge || '/icons/badge.png',     // Androidでのバッジアイコン
+        icon: data.icon || '/icons/icon-192x192.png',
+        badge: data.badge || '/icons/badge.png',
         vibrate: [200, 100, 200],
-        data: {
-            url: data.url || '/', // 通知クリック時に開くURL
-            dateOfArrival: Date.now(),
-            primaryKey: 1
-        }
+        data: { url: data.url || '/', dateOfArrival: Date.now(), primaryKey: 1 }
     };
-
-    event.waitUntil(
-        self.registration.showNotification(data.title, options)
-    );
+    event.waitUntil(self.registration.showNotification(data.title, options));
 });
 
-// 通知クリックイベント
+// 通知クリックイベント（変更なし）
 self.addEventListener('notificationclick', (event) => {
-    event.notification.close(); // 通知を閉じる
-
-    event.waitUntil(
-        clients.openWindow(event.notification.data.url || '/') // 通知に設定されたURLを開く
-    );
+    event.notification.close();
+    event.waitUntil(clients.openWindow(event.notification.data.url || '/'));
 });
-
-// Background Sync (例: 定期的なゴミ出しルールのチェックと通知のスケジューリング)
-// この部分は、複雑なロジックのためここでは実装を省略します。
-// 例:
-// self.addEventListener('sync', (event) => {
-//     if (event.tag === 'check-trash-schedule') {
-//         event.waitUntil(syncTrashScheduleAndNotify());
-//     }
-// });
-// function syncTrashScheduleAndNotify() {
-//     // ここでLocalStorageからゴミ出しルールを読み込み、
-//     // 翌日のゴミをチェックし、通知を生成するロジックを実装
-//     // ただし、Service Workerから直接LocalStorageを読み込むことはできないため、
-//     // PostMessageなどを使ってクライアントと通信する必要がある
-//     console.log('Background sync: Checking trash schedule...');
-//     return Promise.resolve(); // 実際は非同期処理
-// }
